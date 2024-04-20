@@ -22,9 +22,9 @@ class ProfileAPIServer(rpclib.RpcServer):
     def __init__(self, user, visitor):
         self.user = user
         self.visitor = visitor
-        #os.setgid(61007)
-        os.setuid(61013)
         os.setgid(61007)
+        os.setuid(61013)
+        #os.setgid(61007)
 
     def rpc_get_self(self):
         return self.user
@@ -65,13 +65,13 @@ class ProfileServer(rpclib.RpcServer):
         uid = 61015
 
         userdir = '/tmp'
-        userprofile = user
-        userprofile = userprofile.replace("/", "").replace(".", "_")
-        userdir+="/"
-        userdir+= userprofile 
+     
+        userdir +="/%s" % str(hashlib.sha512(user).hexdigest())[0:5]
+        
         if not os.path.exists(userdir):
             os.mkdir(userdir)
-            os.chmod(userdir, 0330)
+            os.chmod(userdir, 0755)
+            os.chown(userdir, uid, uid)
 
 
         (sa, sb) = socket.socketpair(socket.AF_UNIX, socket.SOCK_STREAM, 0)
